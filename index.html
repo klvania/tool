@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discordメッセージ送信</title>
+</head>
+<body>
+    <h2>Discordメッセージ送信</h2>
+    <label for="token">User Token:</label>
+    <input type="text" id="token" placeholder="User Token">
+    <br>
+    <label for="channelId">チャンネルID:</label>
+    <input type="text" id="channelId" placeholder="チャンネルID">
+    <br>
+    <label for="message">メッセージ:</label>
+    <input type="text" id="message" placeholder="メッセージ">
+    <br>
+    <button onclick="sendMessage()">送信</button>
+    <p id="status"></p>
+
+    <script>
+        async function sendMessage() {
+            const token = document.getElementById('token').value;
+            const channelId = document.getElementById('channelId').value;
+            const message = document.getElementById('message').value;
+            const status = document.getElementById('status');
+
+            if (!token || !channelId || !message) {
+                status.textContent = 'すべてのフィールドを入力してください';
+                return;
+            }
+
+            const url = `https://discord.com/api/v9/channels/${channelId}/messages`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content: message })
+            });
+
+            if (response.ok) {
+                status.textContent = '送信成功！';
+            } else {
+                status.textContent = '送信失敗！エラーログを確認してください。';
+            }
+        }
+    </script>
+</body>
+</html>
