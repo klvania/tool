@@ -50,7 +50,19 @@
             font-size: 16px;
         }
 
-        input[type="text"]:focus, input[type="number"]:focus {
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #444;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+            font-size: 16px;
+            resize: vertical;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
             outline: none;
             border-color: #4CAF50;
         }
@@ -130,7 +142,7 @@
         <input type="text" id="channelId" placeholder="チャンネルID">
         <br>
         <label for="message">メッセージ:</label>
-        <input type="text" id="message" placeholder="メッセージ">
+        <textarea id="message" rows="3" placeholder="メッセージ"></textarea>
         <br>
         <label for="count">送信回数:</label>
         <input type="number" id="count" placeholder="送信回数" min="1" value="1">
