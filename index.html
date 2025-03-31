@@ -16,14 +16,22 @@
     <label for="message">メッセージ:</label>
     <input type="text" id="message" placeholder="メッセージ">
     <br>
-    <button onclick="sendMessage()">送信</button>
+    <label for="count">送信回数:</label>
+    <input type="number" id="count" placeholder="送信回数" min="1" value="1">
+    <br>
+    <label for="interval">インターバル (秒):</label>
+    <input type="number" id="interval" placeholder="インターバル" min="1" value="1">
+    <br>
+    <button onclick="sendMessages()">送信</button>
     <p id="status"></p>
 
     <script>
-        async function sendMessage() {
+        async function sendMessages() {
             const token = document.getElementById('token').value;
             const channelId = document.getElementById('channelId').value;
             const message = document.getElementById('message').value;
+            const count = parseInt(document.getElementById('count').value);
+            const interval = parseInt(document.getElementById('interval').value);
             const status = document.getElementById('status');
 
             if (!token || !channelId || !message) {
@@ -31,20 +39,38 @@
                 return;
             }
 
-            const url = `https://discord.com/api/v9/channels/${channelId}/messages`;
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Authorization': token,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ content: message })
-            });
+            if (count < 1 || interval < 1) {
+                status.textContent = '送信回数とインターバルは1以上で指定してください';
+                return;
+            }
 
-            if (response.ok) {
-                status.textContent = '送信成功！';
+            const url = `https://discord.com/api/v9/channels/${channelId}/messages`;
+            let successCount = 0;
+
+            for (let i = 0; i < count; i++) {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ content: message })
+                });
+
+                if (response.ok) {
+                    successCount++;
+                }
+
+                // インターバルを守る
+                if (i < count - 1) {
+                    await new Promise(resolve => setTimeout(resolve, interval * 1000));
+                }
+            }
+
+            if (successCount === count) {
+                status.textContent = `${count}件のメッセージが正常に送信されました！`;
             } else {
-                status.textContent = '送信失敗！エラーログを確認してください。';
+                status.textContent = `送信されたメッセージ数: ${successCount}件。エラーログを確認してください。`;
             }
         }
     </script>
