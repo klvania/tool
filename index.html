@@ -19,13 +19,25 @@
     <label for="count">送信回数:</label>
     <input type="number" id="count" placeholder="送信回数" min="1" value="1">
     <br>
-    <label for="interval">インターバル (秒):</label>
-    <input type="number" id="interval" placeholder="インターバル" min="1" value="1">
+    <label for="interval">インターバル (ミリ秒):</label>
+    <input type="number" id="interval" placeholder="インターバル" min="1" value="1000">
     <br>
     <button onclick="sendMessages()">送信</button>
+    <button onclick="stopSending()">停止</button>
     <p id="status"></p>
 
+    <h3>送信ログ</h3>
+    <ul id="log"></ul>
+
     <script>
+        let sending = false;
+        let cancelRequest = false;
+
+        function formatTime() {
+            const now = new Date();
+            return `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+        }
+
         async function sendMessages() {
             const token = document.getElementById('token').value;
             const channelId = document.getElementById('channelId').value;
@@ -33,6 +45,7 @@
             const count = parseInt(document.getElementById('count').value);
             const interval = parseInt(document.getElementById('interval').value);
             const status = document.getElementById('status');
+            const log = document.getElementById('log');
 
             if (!token || !channelId || !message) {
                 status.textContent = 'すべてのフィールドを入力してください';
@@ -44,10 +57,19 @@
                 return;
             }
 
+            sending = true;
+            cancelRequest = false;
+            status.textContent = `メッセージ送信中... (${count}回、${interval}msごと)`;
+
             const url = `https://discord.com/api/v9/channels/${channelId}/messages`;
             let successCount = 0;
 
             for (let i = 0; i < count; i++) {
+                if (cancelRequest) {
+                    status.textContent = '送信停止されました';
+                    break;
+                }
+
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -57,21 +79,31 @@
                     body: JSON.stringify({ content: message })
                 });
 
+                const time = formatTime();
                 if (response.ok) {
                     successCount++;
+                    const logItem = document.createElement('li');
+                    logItem.textContent = `[${time}] メッセージ送信成功: 回数 ${i + 1} - ${message}`;
+                    log.appendChild(logItem);
+                } else {
+                    const logItem = document.createElement('li');
+                    logItem.textContent = `[${time}] メッセージ送信失敗: 回数 ${i + 1} - エラー: ${response.status} ${response.statusText}`;
+                    log.appendChild(logItem);
                 }
 
                 // インターバルを守る
-                if (i < count - 1) {
-                    await new Promise(resolve => setTimeout(resolve, interval * 1000));
+                if (i < count - 1 && !cancelRequest) {
+                    await new Promise(resolve => setTimeout(resolve, interval));
                 }
             }
 
-            if (successCount === count) {
-                status.textContent = `${count}件のメッセージが正常に送信されました！`;
-            } else {
-                status.textContent = `送信されたメッセージ数: ${successCount}件。エラーログを確認してください。`;
+            if (!cancelRequest) {
+                status.textContent = `${successCount}件のメッセージが正常に送信されました！`;
             }
+        }
+
+        function stopSending() {
+            cancelRequest = true;
         }
     </script>
 </body>
