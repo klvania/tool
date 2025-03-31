@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord spam tool</title>
+    <title>Discordメッセージ送信</title>
     <style>
         /* 全体のデザイン */
         body {
@@ -25,18 +25,7 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             width: 400px;
             max-width: 100%;
-            box-sizing: border-box;
-            display: none; /* 最初は非表示 */
-        }
-
-        .login-container {
-            background-color: #2c2f36;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            width: 400px;
-            max-width: 100%;
-            box-sizing: border-box;
+            box-sizing: border-box; /* これでパディングも考慮 */
         }
 
         h2 {
@@ -60,7 +49,7 @@
             background-color: #333;
             color: #fff;
             font-size: 16px;
-            box-sizing: border-box;
+            box-sizing: border-box; /* パディングを含めたサイズ計算 */
         }
 
         textarea {
@@ -82,7 +71,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            margin-bottom: 10px;
+            margin-bottom: 10px; /* ボタンの間隔調整 */
         }
 
         button:hover {
@@ -119,7 +108,7 @@
             font-family: 'Courier New', monospace;
             font-size: 14px;
             border: 2px solid #444;
-            box-sizing: border-box;
+            box-sizing: border-box; /* パディングを含めたサイズ計算 */
         }
 
         /* ログアイテムの色 */
@@ -153,17 +142,7 @@
     </style>
 </head>
 <body>
-    <!-- ログインフォーム -->
-    <div class="login-container">
-        <h2>ログイン</h2>
-        <label for="password">パスワード:</label>
-        <input type="text" id="password" placeholder="パスワードを入力">
-        <button onclick="login()">ログイン</button>
-        <p id="login-status" class="status"></p>
-    </div>
-
-    <!-- Discordメッセージ送信フォーム -->
-    <div class="container" id="message-container">
+    <div class="container">
         <h2>Discordメッセージ送信</h2>
         <label for="token">User Token:</label>
         <input type="text" id="token" placeholder="User Token">
@@ -194,21 +173,7 @@
 
         function formatTime() {
             const now = new Date();
-            return `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-        }
-
-        function login() {
-            const passwordInput = document.getElementById('password').value;
-            const correctPassword = '7xhw01j49'; // ここに設定するパスワードを入力
-
-            if (passwordInput === correctPassword) {
-                document.querySelector('.login-container').style.display = 'none';
-                document.getElementById('message-container').style.display = 'block';
-            } else {
-                const loginStatus = document.getElementById('login-status');
-                loginStatus.textContent = 'パスワードが間違っています';
-                loginStatus.className = 'status error';
-            }
+            return ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')};
         }
 
         async function sendMessages() {
@@ -234,10 +199,10 @@
 
             sending = true;
             cancelRequest = false;
-            status.textContent = `メッセージ送信中... (${count}回、${interval}msごと)`;
+            status.textContent = メッセージ送信中... (${count}回、${interval}msごと);
             status.className = 'status';
 
-            const url = `https://discord.com/api/v9/channels/${channelId}/messages`;
+            const url = https://discord.com/api/v9/channels/${channelId}/messages;
             let successCount = 0;
 
             for (let i = 0; i < count; i++) {
@@ -262,8 +227,27 @@
                 if (response.ok) {
                     successCount++;
                     logItem.classList.add('success');
-                    logItem.textContent = `[${time}] メッセージ送信成功: 回数 ${i + 1} - ${message}`;
+                    logItem.textContent = [${time}] メッセージ送信成功: 回数 ${i + 1} - ${message};
                 } else {
                     logItem.classList.add('error');
-                    logItem.textContent = `[${time}] メッセージ送信失敗: 回数 ${i + 1} - エラー: ${response.status} ${response.statusText}`;
+                    logItem.textContent = [${time}] メッセージ送信失敗: 回数 ${i + 1} - エラー: ${response.status} ${response.statusText};
                 }
+                log.appendChild(logItem);
+
+                if (i < count - 1 && !cancelRequest) {
+                    await new Promise(resolve => setTimeout(resolve, interval));
+                }
+            }
+
+            if (!cancelRequest) {
+                status.textContent = ${successCount}件のメッセージが正常に送信されました！;
+                status.className = 'status success';
+            }
+        }
+
+        function stopSending() {
+            cancelRequest = true;
+        }
+    </script>
+</body>
+</html>
