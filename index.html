@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discordメッセージ送信</title>
+    <style>
+        #log {
+            width: 100%;
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f9f9f9;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
     <h2>Discordメッセージ送信</h2>
@@ -27,7 +38,7 @@
     <p id="status"></p>
 
     <h3>送信ログ</h3>
-    <ul id="log"></ul>
+    <div id="log"></div>
 
     <script>
         let sending = false;
@@ -80,16 +91,17 @@
                 });
 
                 const time = formatTime();
+                const logItem = document.createElement('div');
+                logItem.style.marginBottom = '5px'; // ログ間隔を調整
                 if (response.ok) {
                     successCount++;
-                    const logItem = document.createElement('li');
                     logItem.textContent = `[${time}] メッセージ送信成功: 回数 ${i + 1} - ${message}`;
-                    log.appendChild(logItem);
+                    logItem.style.color = 'green'; // 成功した場合は緑色
                 } else {
-                    const logItem = document.createElement('li');
                     logItem.textContent = `[${time}] メッセージ送信失敗: 回数 ${i + 1} - エラー: ${response.status} ${response.statusText}`;
-                    log.appendChild(logItem);
+                    logItem.style.color = 'red'; // 失敗した場合は赤色
                 }
+                log.appendChild(logItem);
 
                 // インターバルを守る
                 if (i < count - 1 && !cancelRequest) {
